@@ -1,10 +1,6 @@
 ### 1 Permissions
 sudo visudo
 # Append "admin  ALL=(ALL) NOPASSWD: ALL", use Ctrl+Shift+O to save and Ctrl+Shift+X to exit visudo
-sudo -i
-gedit /etc/polkit-1/localauthority/50-local.d/passwd-policy.pkla
-# Addend lines "[Disable password prompt]", "Identity=unix-user:admin", "Action=*" and "ResultActive=yes"
-exit
 
 ### 2 Clean before update
 sudo apt-get -y purge firefox* libreoffice* gnome-calendar* gnome-contacts* gnome-weather* geary*
@@ -58,3 +54,10 @@ sudo apt-get install -y golang libgl1-mesa-dev xorg-dev
 go mod init fyne_mod
 go get fyne.io/fyne/v2
 go mod tidy
+
+
+### To disable password prompts (Doesn't yet work)
+sudo -i
+gedit /etc/polkit-1/localauthority/50-local.d/passwd-policy.pkla
+# Addend lines "[Disable password prompt]", "Identity=unix-user:admin", "Action=*" and "ResultActive=yes"
+exit
