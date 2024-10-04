@@ -1,0 +1,38 @@
+### 1 Permissions
+sudo -i             #| Enters root for the terminal session.
+visudo              #| Opens the config for terminal password requests using nano.
+# Set "%admin    ALL=(ALL:ALL) NOPASSWD:ALL", then Ctrl+Shift+O to save and Ctrl+Shift+X to exit nano.
+# In "Passwords and Keys" goto Password->Login->Change, and leave it blank to prevent keyring password requests.
+
+### 2 Clean
+apt-get -y purge libreoffice* gnome-calendar* gnome-contacts* gnome-weather* geary*
+apt-get -y purge libreoffice-calc libreoffice-draw libreoffice-impress libreoffice-math libreoffice-writer
+apt -y autoremove
+apt-get clean
+
+### 3 Update
+apt -y update
+apt -y upgrade
+apt -y dist-upgrade
+apt -y autoremove
+apt-get clean
+fwupdmgr get-devices
+fwupdmgr get-updates
+fwupdmgr -y update
+flatpak update
+reboot now
+
+### 4 Optional
+  # 4.1 Updating Node
+    # Install Node Version Manager (nvm) as described on github.com/nvm-sh/nvm
+    # Specifying top-version when updating node seems to get LTS version:
+    nvm install [<version>]
+
+  # 4.2 Other successful install methods
+    # TypeScript: apt install node-typescript
+    # Loupe:      flatpak install flathub org.gnome.Loupe
+
+  # 4.3 Shortcuts
+    chmod +x ~/Documents/GitHub/Bash-scripts/Toggle_GNOME-topbar.sh
+    # Add keyboard shortcut "bash /home/admin/Documents/GitHub/Bash-scripts/Toggle_GNOME-topbar.sh"
+    # Install dconf Editor and set /org/desktop/wm/keybindings/always-on-top to ['<Super>A']
