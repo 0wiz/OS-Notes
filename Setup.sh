@@ -1,5 +1,7 @@
 #!/bin/bash -u
 
+ans=''
+
 ### 1 Permissions
   sudo visudo # Opens the config for terminal password requests using nano.
   # Set "%admin    ALL=(ALL:ALL) NOPASSWD:ALL", then Ctrl+Shift+O to save and Ctrl+Shift+X to exit nano.
@@ -49,12 +51,12 @@
   snap install spotify
   flatpak -y install flathub org.gnome.Loupe com.github.rafostar.Clapper
   apt -y install git ffmpeg
-  git config --global user.name Owiz
-  git config --global user.email owiz@protonmail.com
+  git config --system user.name Owiz
+  git config --system user.email owiz@protonmail.com
   
   # 3.2 Optional Apps
-  while [[ ! $rep =~ (y|n) ]]; do read -p 'Install Steam (y/n): ' rep
-  if [[ $rep == 'y' ]]; then
+  while [[ ! $ans =~ (y|n) ]]; do read -p 'Install Steam (y/n): ' ans; done
+  if [[ $ans == 'y' ]]; then
     flatpak -y install flathub com.valvesoftware.Steam
     apt -y install steam-devices
   fi
