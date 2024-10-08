@@ -1,56 +1,79 @@
-#!/bin/sh -u
+#!/bin/bash -u
 
 ### 1 Permissions
-  sudo -i # Enters root for the current terminal session.
-  visudo # Opens the config for terminal password requests using nano.
+  sudo visudo # Opens the config for terminal password requests using nano.
   # Set "%admin    ALL=(ALL:ALL) NOPASSWD:ALL", then Ctrl+Shift+O to save and Ctrl+Shift+X to exit nano.
   # In "Passwords and Keys" goto Password->Login->Change, and leave it blank to prevent keyring password requests.
-  apt-mark manual gdm3 gnome-shell gnome-browser-connector # Protects the specified packages from auto-removal.
+  sudo apt-mark manual gdm3 gnome-shell gnome-browser-connector # Protects the specified packages from auto-removal.
 
 ### 2 Uninstalls
-  # 2.0 Identify Specific Package Names
-    list='libreoffice geary evince brasero zorin-connect evolution totem'
-    gnome_list='calender characters contacts photos weather'
-    list="$(for v in $list; do printf "$v|"; done)$(for v in $gnome_list; do printf "gnome-$v|"; done)"
-    apt list --installed | grep -E '(${list%|})'
+    list=(
+      brasero brasero-common nautilus-extension-brasero
+      cheese
+      eog
+      evince
+      evolution evolution-data-server
+      geary
+      gnome-calendar
+      gnome-characters
+      gnome-clocks
+      gnome-contacts
+      gnome-font-viewer
+      gnome-logs
+      gnome-photos
+      gnome-sound-recorder
+      gnome-weather
+      libreoffice-common libreoffice-core libreoffice-style-yaru
+      remmina
+      rhythmbox
+      totem
+      zorin-connect gnome-shell-extension-zorin-connect gnome-shell-extension-zorin-connect-browsers
+      zorin-os-upgrader
+    )
+    
+    sudo apt purge ${list[@]} # Read before approving operation.
+    echo -e '\nThese similar packages were NOT REMOVED:'
+    sudo dpkg --get-selections | grep -E "($(IFS="|"; echo "${list[*]}"))"
+    echo -e '\nPress [Ctrl+C] to cancel and [Enter] to continue.' && read
 
-  # 2.1 Update List & Purge
-    apt -y purge *libreoffice* *geary* *evince* *brasero* *zorin-connect* *evolution*
-    apt -y purge *gnome-calendar* *gnome-characters* *gnome-contacts* *gnome-photos* *gnome-weather* *totem*
-    apt -y purge *libreoffice-calc* *libreoffice-draw* *libreoffice-impress* *libreoffice-math* *libreoffice-writer*
-
-### 3 Update & Clean
-  apt -y update
-  apt -y upgrade
-  apt -y dist-upgrade
-  fwupdmgr get-devices
-  fwupdmgr get-updates
-  fwupdmgr -y update
+### 3 Installs
+  # 3.0 Updates
+  sudo apt -y update && sudo apt -y dist-upgrade
+  fwupdmgr get-devices >/dev/null
+  fwupdmgr get-updates && fwupdmgr -y update
   flatpak update
   rm -rf ~/.cache/gnome-software
-  apt -y autoremove
-  apt clean
-  read -p 'Press [Enter] to reboot system' && reboot now
+  
+  # 3.1 Standard Apps
+  snap install --classic code
+  snap install spotify
+  flatpak -y install flathub org.gnome.Loupe com.github.rafostar.Clapper
+  apt -y install git ffmpeg
+  git config --global user.name Owiz
+  git config --global user.email owiz@protonmail.com
+  
+  # 3.2 Optional Apps
+  while [[ ! $rep =~ (y|n) ]]; do read -p 'Install Steam (y/n): ' rep
+  if [[ $rep == 'y' ]]; then
+    flatpak -y install flathub com.valvesoftware.Steam
+    apt -y install steam-devices
+  fi
+  
+  # 3.3 Clean
+  sudo apt -y autoremove
+  sudo apt clean
+  read -p 'Press [Ctrl+C] to cancel and [Enter] to reboot system.' && sudo reboot now
 
 ### 4 Setup Software
-  # 4.0 Simple Installs
-  apt -y install ffmpeg
-  snap install --classic code spotify
-  flatpak install flathub org.gnome.Loupe com.github.rafostar.Clapper
-
-  # 4.1 Firefox
+  # 4.0 Firefox
   # Copy profile files into ~/.mozilla/firefox/xxxxxxxx.default-release/
 
-  # 4.2 Git
-    git config --global user.name Owiz
-    git config --global user.email owiz@protonmail.com
-
-  # 4.3 Python
+  # 4.1 Python
     apt -y install python3 # Consider using a pre-installed version, Ubuntu has Python among its dependencies.
     echo "alias py=python3" >> ~/.bashrc
     source ~/.bashrc
 
-  # 4.4 Node.js & TypeScript
+  # 4.2 Node.js & TypeScript
     # Install Node Version Manager (nvm) as described on github.com/nvm-sh/nvm
     nvm install <version> # Specifying major version seems to get Node LTS.
     apt -y install node-typescript
