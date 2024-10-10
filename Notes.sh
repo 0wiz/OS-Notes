@@ -2,7 +2,7 @@
   sudo -i # Enters root for the current terminal session.
 
   # 1.0 Slacken Terminal Password Security
-    sudo visudo # Opens the config for terminal password requests using nano.
+    visudo # Opens the config for terminal password requests using nano.
     # Set "%admin    ALL=(ALL:ALL) NOPASSWD:ALL", then Ctrl+Shift+O to save and Ctrl+Shift+X to exit nano.
 
   # 1.1 Slacken GUI Password Security
@@ -15,6 +15,7 @@
   dconf dump / > dconfdump # Saves a bunch of gnome-managed settings to file 'dconfdump'.
   dconf load / < dconfdump # Loads the gnome-managed settings of file 'dconfdump'.
   lsb_release -a # Prints the OS version
+  systemctl reboot --firmware-setup # Restart and enter BIOS/UEFI, sometimes warned against.
 
 ### 3 App Installation
   # 3.0 Node.js & TypeScript
@@ -24,7 +25,7 @@
 
   # 3.1 Beekeeper Studio
     flatpak -y install flathub io.beekeeperstudio.Studio
-    sudo flatpak override io.beekeeperstudio.Studio --filesystem=host
+    flatpak override io.beekeeperstudio.Studio --filesystem=host
 
 ### 4 App Usage
   # 4.0 Wine
