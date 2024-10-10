@@ -7,7 +7,7 @@
 
   # 1.1 Slacken GUI Password Security
   # In "Passwords and Keys" goto Password->Login->Change, and leave it blank to prevent keyring password requests.
-  # If no keyring is created, logging into VS Code will prompt one, or just goto Add->'Password Keyring'.
+  # If no keyring is present, panic! Specific apps may want prompt new keyrings, but not for the software manager.
 
 ### 2 Other System Commands
   # FYI: Nautilus mounts drives in /media/<user>/
@@ -47,3 +47,15 @@
       -c:a <codec>        #| Specifies audio encoding, normally "-c:a copy". At default it matches video codec.
     ffplay -i i.mkv       #| Plays the specified file.
       -vf cropdetect      #| Continuously prints detected stream black bars as "crop=3840:1920:0:120".
+
+### 5 Thoughts
+  # 5.0 Desktop Environments
+    # DEs that feel refined are rare and the change takes energy, there's a reason that so many distros use Gnome.
+    # That said, Gnome is rigid, tread carefully when customizing beyond normal tweaks.
+
+  # 5.1 Distributions
+    # Compatibility goes up every year, prioritize distros with a good release schedule, avoid year-old releases.
+    # Derivatives may tardy when following primitives and even market the news of thier primitives as their own.
+    # Ubuntu follows Debian closely, and kernel version is mentioned as the more important update in new releases.
+    # Adoption is important for open source, refined impressions tends to accompany refined systems.
+    # Try Ubuntu-derivatives for compatibility improvements or otherwise better refinement, otherwise just use Ubuntu.
