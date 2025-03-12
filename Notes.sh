@@ -14,8 +14,10 @@
   # 2.0 General
     # NOTE: Nautilus mounts drives in /media/<user>/
     dpkg --get-selections | grep <package>
-    dconf dump / > dconfdump # Saves a bunch of gnome-managed settings to file 'dconfdump'.
-    dconf load / < dconfdump # Loads the gnome-managed settings of file 'dconfdump'.
+    dconf dump / > dconfdump # Saves non-default gnome settings to file 'dconfdump'.
+      | sed '/app-folders/,/^$/d' # Append to omit app folders from Gnome Activities Overview.
+      | grep 'int[0-9]\+ [0-9]\{10\}' | sed '/]/N;/\n$/d' # Append to omit likely timestamps and empty schemas.
+    dconf load / < dconfdump # Loads the gnome settings of file 'dconfdump' into the system.
     lsb_release -a # Prints the OS version
     systemctl reboot --firmware-setup # Restart and enter BIOS/UEFI, sometimes warned against.
 

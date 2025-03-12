@@ -49,6 +49,7 @@
     libreoffice-common libreoffice-core libreoffice-style-yaru
     remmina
     rhythmbox
+    nautilus-sendto
     totem
   )
   
