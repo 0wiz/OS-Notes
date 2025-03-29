@@ -50,27 +50,85 @@
     winetricks            #| Additional functionality like wrappers for dependencies. Installed seperately.
   
   # 4.1 ffmpeg
-    ffmpeg -i i.mkv       #| Performs an operation on the specified file, default only prints info. Put options after.
+    ffmpeg -i i.mkv o.mkv #| Performs an operation on the specified file, default only prints info.
       -v <level>          #| Verbosity levels: quiet, panic, fatal, error, warning, info (default), verbose.
-      -ss X -to X         #| Specifies the start and end seconds for operation. Put before crop.
-      -vf “crop=X:X:X:X”  #| Specifies cropping for operation.
-      -c:v <codec>        #| Specifies video encoding, for ex. libx265 for CPU. (GPU encoding not worth it?)
+      -hide_banner        #| Prevents all the flags & library versions from being printed. Redundant below "-v info".
+      -stats              #| Specifies to print progress regardless of verbosity level. Antonym is -nostats.
+      -ss X -to X         #| Specifies the start and end time (S or HH:MM:SS) for operation. Put before crop & input.
+      -vf “crop=X:X:X:X”  #| Specifies cropping for encoding (Width:Height:X:Y).
+      -vf "transpose=1"   #| Appends rotation for encoding (1 for clockwise & 2 for counterclockwise).
+      -r X                #| Specifies framerate for encoding, with constant or variable rate depending on format.
+      -c:v <codec>        #| Specifies video encoding, for ex. libx265 (CPU). At default libx264.
         -preset 6         #| 265/264: Sets compression efficiency, ultrafast (0) to veryslow (8), at default 5.
-        -crf 15           #| 265/264: Constant Rate Factor sets compression quality from 1 to 51, at default 28.
-      -c:a <codec>        #| Specifies audio encoding, normally "-c:a copy". At default it matches video codec.
+        -crf 15           #| 265/264: Constant Rate Factor sets compression quality loss from 0 to 51, at default 28.
+        -x265-params      #| 265: Specify parameters to pass to libx265. Put after encoding.
+          log-level=X     #| Verbosity levels: 0 (error), 1 (warning), 2 (info), 3 (debug), 4 (full). At default 2.
+      -c:a <codec>        #| Specifies audio encoding. At default it matches video codec.
+      -metadata comment=  #| Specifies the metadata comment-line. Leave blank to clear comment.
+      -strict unofficial  #| Specifies to not apply a strict YUV, removes "Non full-range YUV is non-standard" error.
+    ffmpeg -i i.mp4 -vsync vfr -vf "select='eq(pict_type,I)'" -q:v 2 o%d.jpg #| Extract I-frames
     ffplay -i i.mkv       #| Plays the specified file.
-      -vf cropdetect      #| Continuously prints detected stream black bars as "crop=3840:1920:0:120".
-    ffprobe -i i.mkv
-      -show-chapters
+      -vf cropdetect      #| Continuously prints detected stream black bars in the crop format.
+    ffprobe -i i.mkv      #| Prints information gathered from multimedia streams.
+      -show-chapters      #| Show information about chapters stored in the format. 
+      -show_streams       #| Show information about each media stream contained in the input multimedia stream.
+      -select_streams v:0 #| Select only the streams specified, solely affects the options related to streams.
 
     pv i.mkv | ffmpeg -i pipe:0 -v warning {arguments} # TODO: Try pv
 
-### 5 Thoughts
-  # 5.0 Desktop Environments
+  # 4.2 ImageMagick
+    # Winget version lacks support for legacy utilities and may have trouble with adding path.
+    magick [] i.ext o.ext #| Performs an image conversion on the input, formerly "magick convert".
+      -quality X          #| Specifies JPEG/MIFF/PNG compression level, at default 95.
+      -strip              #| Specifies the conversion to clear metadata and comments.
+      -interlace <scheme> #| Specifies the type of image interlacing scheme, for ex. Plane.
+      -gaussian-blur X    #| For ex. 0.05
+      compare i1 i2 i3    #| Compares i1 & i2, marking differences as red in i3 (use NULL: as i3 to not save).
+        -metric <stat>    #| Prints a statistic to represent the difference with a value, for ex. MAE, MSE or RMSE.
+        -density X        #| Specifies the DPI to use when comparing, at default 72.
+    magick *.jpg o.gif    #| Animation example, takes all jpg images in current folder and creates a gif.
+        -delay X          #| Specifies the delay between frames, at default 0, open to gif viewer interpretation.
+        -loop X           #| Specifies the looping of animations, at default 0, meaning indefinitely.
+    mogrify               #| Similar to "magick" but with different options, overwrites the input file.
+      -layers 'optimize'  #| Attempts to optimize the animation, short for 'optimize-frame' & 'optimize-plus'.
+      -fuzz X             #| Colors within this distance (absolute or percent) are considered equal.
+
+### 5 Lexicon
+  # 5.0 Powershell-to-Bash                   Psh | Bash
+    cat (Get-PSReadlineOption).HistorySavePath   | cat ~/.bash_history
+    findstr 'str' (must use citation)            | grep str
+    gi -LiteralPath                              | wc -c
+    $list.ForEach({ echo $_ })                   | for i in $list; do echo $i; done
+    Test-Path 'file.ext'                         | [ -f 'file.ext' ]
+    Write-Host -NoNewLine 'str'                  | echo -n 'str'
+    psshutdown -d -t 0 (requires PSTools)        |
+
+### 6 Powershell Long-liners & Multi-liners
+  # 6.0 Get all filenames (with extensions) matching a pattern
+    $list = ls | foreach Name | where { $_ -match '(jpg|png)$' -and $_ -notmatch '^\d{4}-\d\d-\d\d\s\d\d.\d\d.\d\d' }
+
+  # 6.1 Compress files in list to mp4 (rm extra streams) with 150th frame as thumbnail & print size reductions
+    $list = ls | foreach {[PSCustomObject]@{ in=$_.Name; out=$_.BaseName+"_crf22.mp4" }}
+    $list.ForEach({
+      $frame = [math]::Min(150, (ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 $_.in) - 1)
+      ffmpeg -v error -i $_.in -vf "select=eq(n\,$frame), scale=trunc(iw*144/ih/2)*2:144" -vframes 1 -q:v 7 -f image2pipe -
+      | ffmpeg -v error -stats -i $_.in -i - -map 0 -map 1 -c:v:0 libx265 -x265-params log-level=1 -crf 22 -c:v:1 png -disposition:v:1 attached_pic $_.out
+      echo ("{0:N2}% '$($_.in)'" -f ((1 - (gi -LiteralPath $_.out).Length / (gi -LiteralPath $_.in).Length) * 100))
+    })
+
+  # 6.2 Cut files with induvidual timestamps (leave as zero to skip) & convert to mp4 without re-encoding
+    $ss = @( @("00:00:00","00:00:00"), @("00:00:00","00:00:00") ) # Add one sub-array for each file.
+    $list = ls | foreach -Begin { $i=0 } {
+      [PSCustomObject]@{ in=$_.Name; out=$_.BaseName+"_cut.mp4"; ss=$ss[$i][0]; to=$ss[$i++][1] }
+    }
+    $list.ForEach({ ffmpeg -v warning -ss $_.ss -to $_.to -i $_.in -c copy $_.out })
+
+### 7 Linux Thoughts
+  # 7.0 Desktop Environments
     # DEs that feel refined are rare and the change takes energy, there's a reason that so many distros use Gnome.
     # That said, Gnome is rigid, tread carefully when customizing beyond normal tweaks.
 
-  # 5.1 Distributions
+  # 7.1 Distributions
     # Compatibility goes up every year, prioritize distros with a good release schedule, avoid year-old releases.
     # Derivatives may tardy when following primitives and even market the news of thier primitives as their own.
     # Ubuntu follows Debian closely, and kernel version is mentioned as the more important update in new releases.
