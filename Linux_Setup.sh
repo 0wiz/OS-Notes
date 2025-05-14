@@ -82,7 +82,7 @@
     sudo snap install --classic code
     sudo snap install spotify
     flatpak -y install flathub org.gnome.Loupe com.github.rafostar.Clapper
-    sudo apt -qqy install git ffmpeg pipx firefox 2>&1 | filter 'null' 'install'
+    sudo apt -qqy install git ffmpeg pipx firefox texlive-full 2>&1 | filter 'null' 'install'
     echo "alias py=python3" >> ~/.bashrc
     git config --global user.name Owiz
     git config --global user.email owiz@protonmail.com
