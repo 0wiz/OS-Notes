@@ -1,10 +1,12 @@
 # Things to try, and find out where --scope="machine" works.
 $list = @(
+  '7zip.7zip',
+  'Mozilla.Firefox',
   'Microsoft.PowerToys',
   'Microsoft.Powershell',
   'Microsoft.Sysinternals.PsTools',
   'Microsoft.VisualStudioCode',
-  'Mozilla.Firefox',
+  'Microsoft.VisualStudio.2022.BuildTools',
   'Git.Git',
   'Python.Python.3.12',
   'MiKTeX.MiKTeX',
@@ -17,6 +19,8 @@ $list = @(
   'Spotify.Spotify',
   'Valve.Steam',
   'Discord.Discord',
+  'Proton.ProtonVPN',
+  'Proton.ProtonDrive',
   'qBittorrent.qBittorrent'
 ) # ImageMagick 2025-03-17: Winget version not fully functional, install legacy via executeable.
 
@@ -41,3 +45,6 @@ git config --global user.email owiz@protonmail.com
 #  PowerShell installs requiring Administrator privilages:
 #    Install-Module -Name Microsoft.WinGet.Client
 #    Install-Module -Name Microsoft.WinGet.CommandNotFound
+
+if (!(Test-Path $PROFILE)) { New-Item -path $PROFILE -type File -force }
+Add-Content -path $PROFILE -value ( cat 'Profile.ps1' )
