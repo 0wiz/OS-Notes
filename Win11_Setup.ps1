@@ -1,4 +1,5 @@
 # Things to try, and find out where --scope="machine" works.
+# Note: Default install location is AppData\Local\Microsoft\WinGet\Packages
 $list = @(
   '7zip.7zip',
   'Mozilla.Firefox',
@@ -7,6 +8,7 @@ $list = @(
   'Microsoft.Sysinternals.PsTools',
   'Microsoft.VisualStudioCode',
   'Microsoft.VisualStudio.2022.BuildTools',
+  'Google.PlatformTools',
   'Git.Git',
   'Python.Python.3.12',
   'MiKTeX.MiKTeX',
@@ -47,4 +49,5 @@ git config --global user.email owiz@protonmail.com
 #    Install-Module -Name Microsoft.WinGet.CommandNotFound
 
 if (!(Test-Path $PROFILE)) { New-Item -path $PROFILE -type File -force }
-Add-Content -path $PROFILE -value ( cat 'Profile.ps1' )
+Add-Content -path $PROFILE -value ( Get-Content 'Functions\ff265.ps1' )
+Copy-Item 'Functions\ffstd.ps1' "$HOME\Documents\PowerShell"

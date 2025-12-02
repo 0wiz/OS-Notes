@@ -55,30 +55,37 @@
       -hide_banner        #| Prevents all the flags & library versions from being printed. Redundant below "-v info".
       -stats              #| Specify to print progress regardless of verbosity level. Antonym is -nostats.
       -ss X -to X         #| Set start and end times (S or HH:MM:SS) for cutting. Put before crop & input.
-      -avoid_negative_ts  #| Handle timestamp origo: -1 (auto), 0 (disabled), 1 (make_non_negative), 2 (make_zero).
-      -filter             #| Specify comma-seperated filters. Stream :v & :a can be abbreviated as -vf & -af resp.
-      -filter_complex     #| Specify filtergraph for multiple in/out, for ex. [0:v] specifies video for input 0.
+      -avoid_negative_ts X # Handle timestamp origo: -1 (auto), 0 (disabled), 1 (make_non_negative), 2 (make_zero).
       -vf “crop=X:X:X:X”  #| Set encoding crop (Width:Height:X:Y).
       -vf "scale=X:X"     #| Set encoding resolution (Width:Height). Keep aspect using -1 or trunc(), iw & ih.
       -vf "transpose=1"   #| Set encoding rotation (1 for clockwise & 2 for counterclockwise).
       -r X                #| Set encoding framerate, with constant or variable rate depending on format.
-      -c:v <codec>        #| Specify video encoding, for ex. libx265 (CPU). At default libx264.
-        -preset 6         #| 265/264: Sets compression efficiency, 0 (ultrafast) to 8 (veryslow), at default 5.
-        -crf 15           #| 265/264: Constant Rate Factor sets compression quality loss from 0 to 51, at default 28.
-        -x265-params      #| 265: Specify parameters to pass to libx265. Put after encoding.
+      -c:v <codec>        #| Specify video encoding, for ex. libx265 (CPU) or hevc_nvenc (GPU). At default libx264.
+        -preset 6         #| libx265/264: Sets compression efficiency, 0 (ultrafast) to 8 (veryslow), at default 5.
+        -preset p5        #| hevc_nvenc: Sets compression efficiency, p1 (fastest) to p7 (slowest), at default p4.
+        -crf 22           #| libx265/264: Constant Rate Factor, sets quality loss from 0 to 51, at default 28.
+        -cq:v 28          #| hevc_nvenc: Constant Quality, sets target loss from 0 to 51, at default automatic (0).
+        -x265-params      #| libx265: Specify parameters to pass to libx265. Put after encoding.
           log-level=X     #| Verbosity: 0 (error), 1 (warning), 2 (info), 3 (debug), 4 (full). At default 2.
       -frames:v X         #| Stop writing to the stream after framecount frames.
       -q:v X              #| Set fixed quality scale (VBR) value, 0 (HQ) to 10 (LQ). Alias for qscale.
       -c:a <codec>        #| Specify audio encoding. At default it matches video codec.
-      -af "volume=X"      #| Set volume scaling, for ex. 0.5 for half or 2 for double volume.
-      -af "highpass=f=X"  #| Set highpass filter frequency.
-      -af "lowpass=f=X"   #| Set lowpass filter frequency.
+      -af <filter>        #| Specify an audio filter. For example "volume=0.5", "highpass=f=70" or "lowpass=f=40".
+      -an                 #| Exclude audio streams in encoding. Same for vn, sn, dn in video, subtitles & data resp.
       -movflags <flags>   #| Set various muxing switches. The mov, mp4, and ismv muxers support fragmentation.
-        faststart         #| Set web-optimized, runs a second pass moving the index to the beginning of the file.
-      -metadata comment=  #| Set the metadata comment-line. Leave blank to clear comment.
-      -strict unofficial  #| Specify to not apply a strict YUV, removes "Non full-range YUV is non-standard" error.
-      -lavfi 
+        faststart         #| Web-optimized mode, runs a second pass moving the index to the beginning of the file.
+      -metadata <k>=<v>   #| Set a metadata key-value pair (comment, description, title, language, creation_date).
+        :s:<stream> <k>   #| Specify a stream to set a metadata key-value pair for. For ex. ':s:a:3 title="English"'.
+      -map X              #| Include streams from input X. Append :v:Y for video stream Y. Prepend - to exclude.
+      -map_metadata:g X   #| Include general metadata from the input X, doesn't affect stream-specific metadata.
+      -readrate X         #| Limit processing relative to playback speed by float: 0 (unlimited) & 1 (real-time).
+      -filter             #| Specify comma-seperated filters. Stream :v & :a can be abbreviated as -vf & -af resp.
+      -filter_complex     #| Specify complex filtergraph for multiple in/out. Equivalent to -lavfi.
+        [0:v][1:v]        #| Format for specifying input, in this case video for input 0 & 1. Don't add space after.
+          hstack=inputs=2 #| Specify filtergraph as horizontal stacking, in this case for the two specified inputs.
+          libvmaf         #| Calculates VMAF score for input 0 vs 1 (distored vs original). Above 95 is very good.
         showspectrumpic   #| Creates an audio frequency spectogram and saves it as the output file.
+      -strict unofficial  #| Specify to not apply a strict YUV, removes "Non full-range YUV is non-standard" error.
     ffmpeg -i i.mp4 -vsync vfr -vf "select='eq(pict_type,I)'" -q:v 2 o%d.jpg #| Extract I-frames
     ffplay -i i.mkv       #| Plays the specified file. Can be used to preview settings.
       -vf cropdetect      #| Continuously prints detected stream black bars in the crop format.
@@ -107,8 +114,8 @@
 
 ### 5 Lexicon
   # 5.0 Powershell-to-Bash                   Psh | Bash
-    cat (Get-PSReadlineOption).HistorySavePath   | cat ~/.bash_history
-    findstr 'str' (must use citation)            | grep str
+    cat (Get-PSReadlineOption).HistorySavePath   | History
+    findstr str                                  | grep str
     gi -LiteralPath                              | wc -c
     $list.ForEach({ echo $_ })                   | for i in $list; do echo $i; done
     Test-Path 'file.ext'                         | [ -f 'file.ext' ]
