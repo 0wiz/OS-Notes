@@ -1,4 +1,5 @@
 # Things to try, and find out where --scope="machine" works.
+# Note: Default install location is AppData\Local\Microsoft\WinGet\Packages
 $list = @(
   '7zip.7zip',
   'Mozilla.Firefox',
@@ -7,6 +8,7 @@ $list = @(
   'Microsoft.Sysinternals.PsTools',
   'Microsoft.VisualStudioCode',
   'Microsoft.VisualStudio.2022.BuildTools',
+  'Google.PlatformTools',
   'Git.Git',
   'Python.Python.3.12',
   'MiKTeX.MiKTeX',

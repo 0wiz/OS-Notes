@@ -73,9 +73,12 @@
       -af "volume=X"      #| Set volume scaling, for ex. 0.5 for half or 2 for double volume.
       -af "highpass=f=X"  #| Set highpass filter frequency.
       -af "lowpass=f=X"   #| Set lowpass filter frequency.
+      -an                 #| Exclude audio streams in encoding. Same for vn, sn, dn in video, subtitles & data resp.
       -movflags <flags>   #| Set various muxing switches. The mov, mp4, and ismv muxers support fragmentation.
         faststart         #| Set web-optimized, runs a second pass moving the index to the beginning of the file.
-      -metadata comment=  #| Set the metadata comment-line. Leave blank to clear comment.
+      -metadata <key>     #| Set a metadata key-value pair.
+        comment=<value>   #| Set the metadata comment-line. Leave blank to clear comment.
+        :s:<stream> <key> #| Specify a stream to set a metadata key-value pair for. For ex. ':s:a:3 title="English"'.
       -strict unofficial  #| Specify to not apply a strict YUV, removes "Non full-range YUV is non-standard" error.
       -lavfi 
         showspectrumpic   #| Creates an audio frequency spectogram and saves it as the output file.
@@ -107,8 +110,8 @@
 
 ### 5 Lexicon
   # 5.0 Powershell-to-Bash                   Psh | Bash
-    cat (Get-PSReadlineOption).HistorySavePath   | cat ~/.bash_history
-    findstr 'str' (must use citation)            | grep str
+    cat (Get-PSReadlineOption).HistorySavePath   | History
+    findstr str                                  | grep str
     gi -LiteralPath                              | wc -c
     $list.ForEach({ echo $_ })                   | for i in $list; do echo $i; done
     Test-Path 'file.ext'                         | [ -f 'file.ext' ]
