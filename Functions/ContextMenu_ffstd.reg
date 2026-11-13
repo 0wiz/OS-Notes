@@ -1,0 +1,9 @@
+Windows Registry Editor Version 5.00
+
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.mp4\shell\ffstd]
+@="Compress Video"
+"icon"="%USERPROFILE%\\Documents\\PowerShell\\ffmpeg.ico"
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.mp4\shell\ffstd\command]
+@="\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Oskar\\Documents\\Powershell\\ffstd.ps1\" \"%1\""
